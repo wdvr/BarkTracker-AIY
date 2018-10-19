@@ -3,6 +3,9 @@
 *wav
 *m4a
 
+# only commit settings.py.sample
+settings.py
+
 ### Standard python ignore stuff
 
 # Byte-compiled / optimized / DLL files

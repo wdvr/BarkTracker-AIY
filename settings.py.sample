@@ -1,0 +1,11 @@
+# sender e-mail
+GMAIL_USER = "someone@gmail.com"  
+
+# sender password
+GMAIL_PASSWORD = "mySecretGmailPassword" 
+
+# who should receive e-mails
+RECIPIENTS = ["someone@domain.com", "test@otherdomain.com"]
+    
+# when debug is enabled, the volume treshhold for triggering the voice messages is much lower, for easy testing
+DEBUG = False
