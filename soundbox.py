@@ -37,6 +37,8 @@ def get_random_file(folder, extension="*.mp3"):
 def play_sound(audio_file):
     pygame.mixer.music.load(audio_file)       
     pygame.mixer.music.play()
+    while pygame.mixer.music.get_busy(): 
+        pygame.time.Clock().tick(10)
 
     
 if __name__ == "__main__":

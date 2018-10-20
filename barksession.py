@@ -16,7 +16,6 @@ class Barksession():
         self._debug = debug
         
         self._stop_requested = False
-
         
         self._bark_sessions = []
 

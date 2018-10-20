@@ -49,7 +49,7 @@ class ButtonListener(object):
             else:
                 aiy.audio.say('Starting Barktracker')
             self._tracker_active = True
-            self._last_bark_summary = self._bark_tracker.start()
+            self._bark_tracker.start()
 
             
 def main():
