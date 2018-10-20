@@ -28,7 +28,7 @@ class Gmailsender():
             print("subject: %s" % subject)
             print("content: %s" % text)
             print("to: %s" % recipients)
-            #return
+            return
 
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
@@ -54,4 +54,3 @@ class Gmailsender():
         '''
         p = Process(target=self.send_email, args=(subject, text, recipients,))
         p.start()
-

@@ -14,4 +14,3 @@ DEBUG = True
 
 # FROM_NAME = "Bark Tracker"
 # FROM_EMAIL = "bobby@dogmail.com"
-
