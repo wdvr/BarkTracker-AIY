@@ -60,7 +60,7 @@ def generate_summary(bark_sessions):
         summary = {session[0]: session[1]-session[0] for session in bark_sessions}
         total_duration = sum(summary.values(),datetime.timedelta(0))
         
-        output += "Today we saw {0} barksessions, for a total barktime of {1}. ".format(len(bark_sessions), timedelta_format(total_duration))
+        output += "Today we saw {0} bark sessions, for a total bark time of {1}. ".format(len(bark_sessions), timedelta_format(total_duration))
 
         longest_bark = max(summary.values())
         print(longest_bark)
