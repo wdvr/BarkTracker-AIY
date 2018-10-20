@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+
+'''
+Class to play audio files, randomly, from subfolders
+'''
 import random
 import glob
 import pygame
@@ -26,7 +31,6 @@ def reward():
 
 
 def get_random_file(folder, extension="*.mp3"):
-    print(folder+extension)
     return random.choice(glob.glob(folder+extension))
 
 
