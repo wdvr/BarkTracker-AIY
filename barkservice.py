@@ -121,7 +121,7 @@ class Barksession():
                 soundbox.warn_long()
 
             self._last_bark = datetime.datetime.now()
-      
+
 
 def timedelta_format(time_delta):
     seconds = int(time_delta.total_seconds())

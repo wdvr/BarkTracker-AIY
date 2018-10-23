@@ -14,3 +14,13 @@ DEBUG = True
 
 # FROM_NAME = "Bark Tracker"
 # FROM_EMAIL = "bobby@dogmail.com"
+
+# List of Sonos speakers IP addresses
+
+# SONOS_SPEAKER_IPS = ['192.168.1.13','192.168.1.15']
+SONOS_SPEAKER_IPS = ['192.168.1.2']
+
+# the URI of the channel that should be played on the Sonos speakers. Find it by running 
+# sonosservice.py after filling at least one IP address above
+
+SONOS_CHANNEL_URI = ''
