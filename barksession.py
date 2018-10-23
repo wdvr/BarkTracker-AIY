@@ -37,22 +37,27 @@ class Barksession():
         self._bark_sessions = []
         self._stop_requested = False
         self._detect()
-
     
     def stop(self):
         self._stop_requested = True
-
         
-    def get_sessions(self):
+    def generate_summary(self):
         self._lock.acquire()
-        summary = self._bark_sessions.copy()
+        summary = {session[0]: session[1]-session[0] for session in self._bark_sessions if session[1]}
         self._lock.release()
-        return summary
-        
 
+        if len(summary):
+            total_duration = sum(summary.values(),datetime.timedelta(0))
+            longest_bark = max(summary.values())
+            return "Today we saw {0} bark sessions, for a total bark time of {1}. The longest bark was one of {2}.".format(len(summary), timedelta_format(total_duration), timedelta_format(longest_bark))
+        else: 
+            return "No barks at all today, great!"
+    
     def _detect(self):
-        while not self._stop_requested:
+        while True:
             sound_input.record("/tmp/sound.wav",0.5)
+            if self._stop_requested:
+                return
             current_loudness = sound_input.get_peak_volume("/tmp/sound.wav")
             
             current_time = datetime.datetime.now()
@@ -69,7 +74,6 @@ class Barksession():
                     self._bark_sessions[-1][1] = current_time - datetime.timedelta(seconds=self._reward_timer)
                     self._lock.release()
 
-
                     self._session_email_sent = False
 
                     soundbox.reward()
@@ -81,14 +85,10 @@ class Barksession():
             if(time_difference > datetime.timedelta(seconds=self._stricter_timer)):
                 print("{0}: New bark detected ({1:.2f} dB). Trying the short messages."
                       .format(current_time.strftime("%H:%M:%S"),current_loudness))     
-                # return before
-                if self._stop_requested:
-                    return
                 self._lock.acquire()
-                self._bark_sessions.append([current_time, -1])
+                self._bark_sessions.append([current_time, None])
                 self._lock.release()
                 soundbox.warn_short()
-
             else:
                 text = "Kelvin is being noisy at " + \
                     current_time.strftime("%H:%M:%S") + \
@@ -121,3 +121,24 @@ class Barksession():
                 soundbox.warn_long()
 
             self._last_bark = datetime.datetime.now()
+      
+
+def timedelta_format(time_delta):
+    seconds = int(time_delta.total_seconds())
+    periods = [
+        ('year',        60*60*24*365),
+        ('month',       60*60*24*30),
+        ('day',         60*60*24),
+        ('hour',        60*60),
+        ('minute',      60),
+        ('second',      1)
+    ]
+
+    strings=[]
+    for period_name, period_seconds in periods:
+        if seconds > period_seconds:
+            period_value , seconds = divmod(seconds, period_seconds)
+            has_s = 's' if period_value > 1 else ''
+            strings.append("%s %s%s" % (period_value, period_name, has_s))
+
+    return " ".join(strings)
