@@ -11,6 +11,7 @@ from threading import Thread, Event
 import settings
 from barkservice import Barksession
 from sonosservice import Sonosservice
+from lifxservice import Lifxservice
 from gmailsender import Gmailsender
 
 class ButtonListener(object):
@@ -22,8 +23,8 @@ class ButtonListener(object):
         gmail_sender = Gmailsender(settings.GMAIL_USER, settings.GMAIL_PASSWORD, from_name=settings.FROM_NAME, from_email=settings.FROM_EMAIL, debug=settings.DEBUG)
         bark_tracker = Barksession(gmail_sender, settings.RECIPIENTS, settings.DEBUG)
         sonos_service = Sonosservice(debug=settings.DEBUG)
-
-        self._services= [bark_tracker, sonos_service]
+        lifx_service = Lifxservice(debug=settings.DEBUG)
+        self._services= [bark_tracker, sonos_service, lifx_service]
 
     def run(self):
         self._voicehat_ui.status('power-off')
@@ -56,4 +57,5 @@ def main():
     ButtonListener().run()
 
 if __name__ == '__main__':
+    print("Initializing BarkTracker ...")
     main()
