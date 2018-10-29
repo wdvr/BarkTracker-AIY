@@ -6,6 +6,7 @@ The main file to run. Process that runs indefinitely, and listens for button pre
 
 import aiy.voicehat
 import datetime
+import time
 from threading import Thread, Event
 
 import settings
@@ -32,24 +33,35 @@ class ButtonListener(object):
 
     def _button_listen(self):
         aiy.voicehat.get_button().on_press(self._toggle_button)
+        print("BarkTracker is loaded. Press the button to get started.")
+        self._voicehat_ui.status('error')        
+        time.sleep(5)
+        self._voicehat_ui.status('power-off')
         Event().wait()
         
     def _toggle_button(self):
+        print("button pressed")
         if self._tracker_active:
+            print("will deactivate")
             self._voicehat_ui.status('power-off')
             self._tracker_active = False
-            aiy.audio.say("Welcome back! Here's your summary of what happened: ")
-
-            # Let's shut down in the opposite order
-            for service in self._services[::-1]:
-                service.stop()                        
-                aiy.audio.say(service.generate_summary())
             
+            summaries = []
+            for service in self._services:
+                service.stop()
+                summaries.append(service.generate_summary())
+            
+            aiy.audio.say("Welcome back! Here's your summary of what happened: ")
+            print(summaries)
+            for summary in filter(None, summaries):
+                aiy.audio.say(summary)
         else:
+            print("will activate")
             self._voicehat_ui.status('listening')
             self._tracker_active = True
             aiy.audio.say('Starting Barktracker.')
             for service in self._services:
+                print(service)
                 bg_thread = Thread(target=service.start)
                 bg_thread.start()   
 

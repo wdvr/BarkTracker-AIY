@@ -22,7 +22,7 @@ class Lifxservice():
     
     def generate_summary(self):
         # Not very interesting to show a summary for the sonos service
-        return ""
+        return None
         
         
 if __name__ == '__main__':
