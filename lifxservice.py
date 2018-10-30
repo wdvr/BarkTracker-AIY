@@ -14,7 +14,10 @@ class Lifxservice():
         
     def start(self):
         # make sure lights are off when leaving
-        self._lifxlan.set_power_all_lights("off", rapid=True)
+        if self._debug:
+            print("turning off the lights - DEBUG")
+        else:
+            self._lifxlan.set_power_all_lights("off", rapid=True)
 
     def stop(self):
         # When coming home, I don't really need to turn on all the lights

@@ -13,12 +13,12 @@ from barkdetector import Barkdetector
 from threading import Lock
 
 class Barksession():
-    def __init__(self, gmail_sender, recipients, debug=False):
+    def __init__(self, gmail_sender, recipients, use_ai, ai_labels=None, ai_graph=None, ambient_db=None, debug=False):
         self._gmail_sender = gmail_sender
         self._recipients = recipients
         
-        self._ambient_db = 0.2 if debug else 1  # the ambience noise level in db
-        self._barkdetector = Barkdetector('/home/pi/bark-ai/conv_labels.txt', '/home/pi/bark-ai/default-sound-recognizer.pb', self._ambient_db)
+        self._use_ai = use_ai
+        self._barkdetector = Barkdetector(ai_labels, ai_graph, ambient_db)
 
         self._debug = debug
         self._stop_requested = False
@@ -57,23 +57,18 @@ class Barksession():
             return "No barks at all today, great!"
     
     def _detect(self):
+        tmp_file = "/tmp/sound.wav"
         while True:
-            try:
-                sound_input.record("/tmp/sound.wav",0.5)
-            except:
-                print("recording failed")
+            sound_input.record(tmp_file, 0.5)
+            is_bark = self._barkdetector.is_bark(tmp_file) if self._use_ai else self._barkdetector.is_loud(tmp_file)
             if self._stop_requested:
                 return
-            try:
-                is_bark = self._barkdetector.is_bark("/tmp/sound.wav")
-            except:
-                print("this analysis failed")
-
+            
             current_time = datetime.datetime.now()
 
             time_difference = current_time - self._last_bark
 
-            if current_loudness <= self._ambient_db:
+            if not is_bark:
                 if self._bark_alert and time_difference > datetime.timedelta(seconds=self._reward_timer):
                     print("{0}: Bark stopped. Calm again.".format(current_time.strftime("%H:%M:%S")))
                     if self._session_email_sent:

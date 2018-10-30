@@ -24,3 +24,18 @@ SONOS_SPEAKER_IPS = ['192.168.1.2']
 # sonosservice.py after filling at least one IP address above
 
 SONOS_CHANNEL_URI = ''
+
+# A bark can be detected by 
+# 1. listening for peak volumes (USE_AI=False). This is easy, out of the box.
+# 2. using a trained neural network for bark detection. Might need to be trained for your dog's bark.
+# For 2. 
+USE_AI = False
+
+# When using AI, provide the path to your trained labels(AI_LABELS) and frozen graph (AI_GRAPH). 
+# There should be a label named 'bark'
+AI_LABELS = '/path/to/labels.txt', 
+AI_GRAPH = '/path/to/graph.pb
+
+# When not using AI, provide the ambient volume, under which sound is not considered 'loud'. 
+# You might have to play around with this value to get it right
+AMBIENT_DB = 0.25

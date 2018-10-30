@@ -23,9 +23,11 @@ class Sonosservice():
         self._uri = settings.SONOS_CHANNEL_URI
         
     def start(self):
-        print("starting Sonos playing")
-        for speaker in self._speakers:
-            speaker.play_uri(uri=self._uri,meta=DUMMY_META)
+        if self._debug:
+            print("Turning on the radio - DEBUG")
+        else:
+            for speaker in self._speakers:
+                speaker.play_uri(uri=self._uri,meta=DUMMY_META)
     
     def stop(self):
         for speaker in self._speakers:
