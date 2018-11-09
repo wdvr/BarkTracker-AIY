@@ -5,20 +5,20 @@ A Barksession monitors for volume peaks and plays audio files as a response.
 '''
 
 import datetime
+from threading import Lock
+
 import sound_input
 import soundbox
 import gmailsender
 from barkdetector import Barkdetector
 
-from threading import Lock
-
 class Barksession():
-    def __init__(self, gmail_sender, recipients, use_ai, ai_labels=None, ai_graph=None, ambient_db=None, debug=False):
+    def __init__(self, gmail_sender, recipients, use_ai, ai_labels=None, bark_label=None, ai_graph=None, ambient_db=None, debug=False):
         self._gmail_sender = gmail_sender
         self._recipients = recipients
         
         self._use_ai = use_ai
-        self._barkdetector = Barkdetector(ai_labels, ai_graph, ambient_db)
+        self._barkdetector = Barkdetector(ai_labels, bark_label, ai_graph, ambient_db)
 
         self._debug = debug
         self._stop_requested = False
@@ -31,14 +31,22 @@ class Barksession():
         self._session_email_sent = False
         self._bark_alert = False                # True when barking is ongoing
 
-        self._stricter_timer = 40               # be stricter if re-bark within this # of sec
-        self._reward_timer = 15                 # reward a silence after this # of seconds
+        self._stricter_timer = 5 if debug else 40               # be stricter if re-bark within this # of sec
+        self._reward_timer = 3 if debug else 15                 # reward a silence after this # of seconds
 
         self._lock = Lock()
         
     def start(self):
+        self._lock.acquire()
         self._bark_sessions = []
+        self._lock.release()
+
         self._stop_requested = False
+        self._last_bark = datetime.datetime.min
+        self._last_email = datetime.datetime.min
+        self._session_email_sent = False
+        self._bark_alert = False
+
         self._detect()
     
     def stop(self):
@@ -85,7 +93,7 @@ class Barksession():
 
             self._bark_alert = True
 
-            if(time_difference > datetime.timedelta(seconds=self._stricter_timer)):
+            if(not len(self._bark_sessions) or time_difference > datetime.timedelta(seconds=self._stricter_timer)):
                 print("{0}: New bark detected. Trying the short messages."
                       .format(current_time.strftime("%H:%M:%S")))     
                 self._lock.acquire()

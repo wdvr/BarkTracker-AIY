@@ -7,7 +7,7 @@ The main file to run. Process that runs indefinitely, and listens for button pre
 import aiy.voicehat
 import datetime
 import time
-from threading import Thread, Event
+from threading import Thread, Event, Lock
 
 import settings
 from barkservice import Barksession
@@ -21,12 +21,9 @@ class ButtonListener(object):
         self._tracker_active = False
         self._ui_thread = Thread(target=self._button_listen)
         self._debug = settings.DEBUG
-        gmail_sender = Gmailsender(settings.GMAIL_USER, settings.GMAIL_PASSWORD, from_name=settings.FROM_NAME, from_email=settings.FROM_EMAIL, debug=settings.DEBUG)
-        bark_tracker = Barksession(gmail_sender=gmail_sender, recipients=settings.RECIPIENTS, use_ai=settings.USE_AI, ai_labels=settings.AI_LABELS, ai_graph=settings.AI_GRAPH, ambient_db=settings.AMBIENT_DB, debug=settings.DEBUG)
-        sonos_service = Sonosservice(debug=settings.DEBUG)
-        lifx_service = Lifxservice(debug=settings.DEBUG)
-        self._services= [bark_tracker, sonos_service, lifx_service]
-
+        self._services= None
+        self._lock = Lock()
+        
     def run(self):
         self._voicehat_ui.status('power-off')
         self._ui_thread.start()
@@ -38,7 +35,7 @@ class ButtonListener(object):
             self._toggle_button()
         else:
             self._voicehat_ui.status('error')        
-            time.sleep(5)
+            time.sleep(10)
             self._voicehat_ui.status('power-off')
         Event().wait()
         
@@ -48,9 +45,12 @@ class ButtonListener(object):
             self._tracker_active = False
             
             summaries = []
+            self._lock.acquire()
             for service in self._services:
                 service.stop()
                 summaries.append(service.generate_summary())
+            self._services = None
+            self._lock.release()
             if self._debug:
                 print(summaries)
             else:
@@ -62,9 +62,36 @@ class ButtonListener(object):
             self._tracker_active = True
             if not self._debug:
                 aiy.audio.say('Starting Barktracker.')
+                
+            self._lock.acquire()
+            self._services = create_services()
             for service in self._services:
                 bg_thread = Thread(target=service.start)
                 bg_thread.start()   
+            self._lock.release()
+
+def create_services():
+    gmail_sender = Gmailsender(settings.GMAIL_USER, 
+                               settings.GMAIL_PASSWORD, 
+                               from_name=settings.FROM_NAME, 
+                               from_email=settings.FROM_EMAIL, 
+                               debug=settings.DEBUG)
+    
+    bark_tracker = Barksession(gmail_sender=gmail_sender, 
+                               recipients=settings.RECIPIENTS, 
+                               use_ai=settings.USE_AI, 
+                               ai_labels=settings.AI_LABELS, 
+                               bark_label = settings.BARK_LABEL,
+                               ai_graph=settings.AI_GRAPH, 
+                               ambient_db=settings.AMBIENT_DB, 
+                               debug=settings.DEBUG)
+    
+    sonos_service = Sonosservice(debug=settings.DEBUG)
+    
+    lifx_service = Lifxservice(debug=settings.DEBUG)
+    
+    return [bark_tracker, sonos_service, lifx_service]
+
 
 def main():
     ButtonListener().run()

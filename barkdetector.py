@@ -10,11 +10,12 @@ import sound_input
 
 
 class Barkdetector():
-    def __init__(self, labels, graph_file, ambient_db, debug=False):
+    def __init__(self, labels, bark_label, graph_file, ambient_db, debug=False):
         self._ambient_db = ambient_db
 
         if graph_file and labels:
             self._labels = labels
+            self._bark_label = bark_label
             self._input_name = 'wav_data:0'
             self._output_name='labels_softmax:0'
             self._how_many_labels = 3
@@ -23,11 +24,14 @@ class Barkdetector():
             self._graph = _load_graph(graph_file)
             self._softmax_tensor = self._graph.get_tensor_by_name(self._output_name)
         
-    def is_loud(self, wav):
+    def is_loud(self, wav): 
         """Analyses if the passed audio fragment is considered 'loud'. Returns True if it is higher than the ambient_db"""
-        with open(wav, 'rb') as wav_file:
-            current_loudness = sound_input.get_peak_volume(wav)
-            return current_loudness >= self._ambient_db
+        if self._debug:
+            print("getting peak volume at {}".format(time.time()))
+        current_loudness = sound_input.get_peak_volume(wav)
+        if self._debug:
+            print("result: {}".format(current_loudness))
+        return current_loudness >= self._ambient_db
 
     def is_bark(self, wav):
         """Analyses if the passed audio fragment is a bark. Returns True if the probability is > 25%.
@@ -42,12 +46,12 @@ class Barkdetector():
                 predictions, = sess.run(self._softmax_tensor, {self._input_name: wav_data})
 
                 top_k = predictions.argsort()[-1:][::-1]
-                human_string = self._labels_list[top_k[0]]
+                prediction = self._labels_list[top_k[0]]
                 score = predictions[top_k[0]]
+                if self._debug:
+                    print('{} (score = {:.2f}) - took {:.2f}'.format(prediction, score, time.time() - start))
 
-                print('{} (score = {:.2f}) - took {:.2f}'.format(human_string, score, time.time() - start))
-
-                return human_string == 'yes' and score > 0.25
+                return prediction == self._bark_label and score > 0.25
 
 def _load_labels(filename):
     """Read in labels, one label per line."""
