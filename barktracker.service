@@ -1,0 +1,11 @@
+[Service]
+ExecStart=/home/pi/BarkTracker-AIY/main.py
+WorkingDirectory=/home/pi/BarkTracker-AIY/
+User=pi
+Group=pi
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=barktracker
+
+[Install]
+WantedBy=multi-user.target

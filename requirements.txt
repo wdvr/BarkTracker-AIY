@@ -1,0 +1,7 @@
+requests
+soco
+wavefile
+numpy
+pygame
+tensorflow
+lifxlan
