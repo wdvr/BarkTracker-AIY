@@ -30,7 +30,7 @@ RECIPIENTS = ["someone@domain.com", "test@otherdomain.com"]
 SONOS_SPEAKER_IPS = ['192.168.1.2']
 
 # the URI of the channel that should be played on the Sonos speakers. Find it by running 
-# sonosservice.py after filling at least one IP address above
+# ./sonosservice.py after filling at least one IP address above
 
 SONOS_CHANNEL_URI = ''
 
@@ -61,4 +61,4 @@ AI_GRAPH = '/path/to/graph.pb
 
 # When not using AI, provide the ambient volume, under which sound is not considered 'loud'. 
 # You might have to play around with this value to get it right, depending on your microphone.
-AMBIENT_DB = 0.25
+AMBIENT_DB = 0.30
