@@ -63,8 +63,10 @@ if __name__ == '__main__':
 
     response = ""
     while response.lower() not in ["y", "yes", "n", "no"]:
-        response = input("Play a short sample of your first favorite ({0}) on {1}?".format(
-            favorites[0].title, first_speaker.player_name))
+        response = input(
+            "Play a short sample of your first favorite ({0}) on {1}?".format(
+                favorites[0].title,
+                first_speaker.player_name))
 
     if response in ["y", "yes"]:
         first_speaker.play_uri(uri=favorites[0].get_uri(), meta=DUMMY_META)

@@ -10,7 +10,13 @@ import sound_input
 
 
 class Barkdetector():
-    def __init__(self, labels, bark_label, graph_file, ambient_db, debug=False):
+    def __init__(
+            self,
+            labels,
+            bark_label,
+            graph_file,
+            ambient_db,
+            debug=False):
         self._ambient_db = ambient_db
         self._debug = debug
 
@@ -37,7 +43,7 @@ class Barkdetector():
 
     def is_bark(self, wav):
         """Analyses if the passed audio fragment is a bark. Returns True if the probability is > 25%.
-        Right now this is a dumb implementation, since there is no sliding window for detection 
+        Right now this is a dumb implementation, since there is no sliding window for detection
         (also, it detects the word 'yes', not a bark).
         """
         with open(wav, 'rb') as wav_file:

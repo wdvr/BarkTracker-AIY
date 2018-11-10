@@ -13,7 +13,13 @@ from multiprocessing import Process
 
 
 class Gmailsender():
-    def __init__(self, gmail_email, gmail_password, from_name=None, from_email=None, debug=False):
+    def __init__(
+            self,
+            gmail_email,
+            gmail_password,
+            from_name=None,
+            from_email=None,
+            debug=False):
         self._gmail_email = gmail_email
         self._gmail_password = gmail_password
         self._from_name = from_name if from_name else gmail_email

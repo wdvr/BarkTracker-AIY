@@ -14,7 +14,16 @@ from barkdetector import Barkdetector
 
 
 class Barksession():
-    def __init__(self, gmail_sender, recipients, use_ai, ai_labels=None, bark_label=None, ai_graph=None, ambient_db=None, debug=False):
+    def __init__(
+            self,
+            gmail_sender,
+            recipients,
+            use_ai,
+            ai_labels=None,
+            bark_label=None,
+            ai_graph=None,
+            ambient_db=None,
+            debug=False):
         self._gmail_sender = gmail_sender
         self._recipients = recipients
 
@@ -58,14 +67,15 @@ class Barksession():
 
     def generate_summary(self):
         self._lock.acquire()
-        summary = {session[0]: session[1]-session[0]
+        summary = {session[0]: session[1] - session[0]
                    for session in self._bark_sessions if session[1]}
         self._lock.release()
 
         if len(summary):
             total_duration = sum(summary.values(), datetime.timedelta(0))
             longest_bark = max(summary.values())
-            return "Today we saw {0} bark sessions, for a total bark time of {1}. The longest bark was one of {2}.".format(len(summary), timedelta_format(total_duration), timedelta_format(longest_bark))
+            return "Today we saw {0} bark sessions, for a total bark time of {1}. The longest bark was one of {2}.".format(
+                len(summary), timedelta_format(total_duration), timedelta_format(longest_bark))
         else:
             return "No barks at all today, great!"
 
@@ -83,7 +93,8 @@ class Barksession():
             time_difference = current_time - self._last_bark
 
             if not is_bark:
-                if self._bark_alert and time_difference > datetime.timedelta(seconds=self._reward_timer):
+                if self._bark_alert and time_difference > datetime.timedelta(
+                        seconds=self._reward_timer):
                     print("{0}: Bark stopped. Calm again.".format(
                         current_time.strftime("%H:%M:%S")))
                     if self._session_email_sent:
@@ -119,7 +130,8 @@ class Barksession():
                     self._bark_sessions[-1][0]
                 self._lock.release()
 
-                if not self._session_email_sent and time_since_start_bark > datetime.timedelta(seconds=20):
+                if not self._session_email_sent and time_since_start_bark > datetime.timedelta(
+                        seconds=20):
                     print("{0}: More then 20 seconds, sending first warning."
                           .format(current_time.strftime("%H:%M:%S")))
                     self._gmail_sender.send_email_async(
@@ -132,12 +144,15 @@ class Barksession():
                           .format(current_time.strftime("%H:%M:%S")))
 
                     self._gmail_sender.send_email_async(
-                        "Still going, persistent bark for longer than 20 seconds.", text, self._recipients)
+                        "Still going, persistent bark for longer than 20 seconds.",
+                        text,
+                        self._recipients)
                     self._last_email = current_time
                     self._session_email_sent = True
                 else:
-                    print("{0}: Persistent bark detected. Trying the long messages."
-                          .format(current_time.strftime("%H:%M:%S")))
+                    print(
+                        "{0}: Persistent bark detected. Trying the long messages." .format(
+                            current_time.strftime("%H:%M:%S")))
 
                 soundbox.warn_long()
 
@@ -147,12 +162,12 @@ class Barksession():
 def timedelta_format(time_delta):
     seconds = int(time_delta.total_seconds())
     periods = [
-        ('year',        60*60*24*365),
-        ('month',       60*60*24*30),
-        ('day',         60*60*24),
-        ('hour',        60*60),
-        ('minute',      60),
-        ('second',      1)
+        ('year', 60 * 60 * 24 * 365),
+        ('month', 60 * 60 * 24 * 30),
+        ('day', 60 * 60 * 24),
+        ('hour', 60 * 60),
+        ('minute', 60),
+        ('second', 1)
     ]
 
     strings = []

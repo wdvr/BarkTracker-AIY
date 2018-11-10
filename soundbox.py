@@ -31,7 +31,7 @@ def reward():
 
 
 def get_random_file(folder, extension="*.mp3"):
-    return random.choice(glob.glob(folder+extension))
+    return random.choice(glob.glob(folder + extension))
 
 
 def play_sound(audio_file):
