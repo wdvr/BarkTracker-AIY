@@ -21,6 +21,37 @@ RECIPIENTS = ["someone@domain.com", "test@otherdomain.com"]
 
 
 ######################
+### BARK DETECTION ###
+######################
+
+# A bark can be detected by 
+# 1. listening for peak volumes (USE_AI=False). This is easy, out of the box.
+# 2. using a trained neural network for bark detection. Might need to be trained for your dog's bark.
+# For 2. 
+USE_AI = False
+
+
+######################
+### USING ML MODEL ###
+######################
+
+# When using AI, provide the path to your trained labels(AI_LABELS) and frozen graph (AI_GRAPH). 
+# The label that is the 'trigger word' is defined in BARK_LABEL.
+AI_LABELS = '/path/to/labels.txt'
+BARK_LABEL = 'bark'
+AI_GRAPH = '/path/to/graph.pb
+
+
+#########################
+### USING PEAK VOLUME ###
+#########################
+
+# When not using AI, provide the ambient volume, under which sound is not considered 'loud'. 
+# You might have to play around with this value to get it right, depending on your microphone.
+AMBIENT_DB = 0.30
+
+
+######################
 ### SONOS SETTINGS ###
 ######################
 
@@ -33,32 +64,3 @@ SONOS_SPEAKER_IPS = ['192.168.1.2']
 # ./sonosservice.py after filling at least one IP address above
 
 SONOS_CHANNEL_URI = ''
-
-
-######################
-### BARK DETECTION ###
-######################
-
-# A bark can be detected by 
-# 1. listening for peak volumes (USE_AI=False). This is easy, out of the box.
-# 2. using a trained neural network for bark detection. Might need to be trained for your dog's bark.
-# For 2. 
-USE_AI = False
-
-######################
-### USING ML MODEL ###
-######################
-
-# When using AI, provide the path to your trained labels(AI_LABELS) and frozen graph (AI_GRAPH). 
-# The label that is the 'trigger word' is defined in BARK_LABEL.
-AI_LABELS = '/path/to/labels.txt'
-BARK_LABEL = 'bark'
-AI_GRAPH = '/path/to/graph.pb
-
-#########################
-### USING PEAK VOLUME ###
-#########################
-
-# When not using AI, provide the ambient volume, under which sound is not considered 'loud'. 
-# You might have to play around with this value to get it right, depending on your microphone.
-AMBIENT_DB = 0.30

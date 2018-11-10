@@ -64,7 +64,7 @@ class ButtonListener(object):
             self._tracker_active = True
             if not self._debug:
                 aiy.audio.say('Starting Barktracker.')
-
+            time.sleep(2)
             self._lock.acquire()
             self._services = create_services()
             for service in self._services:
