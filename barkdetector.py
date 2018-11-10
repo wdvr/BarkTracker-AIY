@@ -18,14 +18,15 @@ class Barkdetector():
             self._labels = labels
             self._bark_label = bark_label
             self._input_name = 'wav_data:0'
-            self._output_name='labels_softmax:0'
+            self._output_name = 'labels_softmax:0'
             self._how_many_labels = 3
 
             self._labels_list = _load_labels(labels)
             self._graph = _load_graph(graph_file)
-            self._softmax_tensor = self._graph.get_tensor_by_name(self._output_name)
-        
-    def is_loud(self, wav): 
+            self._softmax_tensor = self._graph.get_tensor_by_name(
+                self._output_name)
+
+    def is_loud(self, wav):
         """Analyses if the passed audio fragment is considered 'loud'. Returns True if it is higher than the ambient_db"""
         if self._debug:
             print("getting peak volume at {}".format(time.time()))
@@ -44,19 +45,23 @@ class Barkdetector():
 
             start = time.time()
             with tf.Session(graph=self._graph) as sess:
-                predictions, = sess.run(self._softmax_tensor, {self._input_name: wav_data})
+                predictions, = sess.run(self._softmax_tensor, {
+                                        self._input_name: wav_data})
 
                 top_k = predictions.argsort()[-1:][::-1]
                 prediction = self._labels_list[top_k[0]]
                 score = predictions[top_k[0]]
                 if self._debug:
-                    print('{} (score = {:.2f}) - took {:.2f}'.format(prediction, score, time.time() - start))
+                    print('{} (score = {:.2f}) - took {:.2f}'.format(prediction,
+                                                                     score, time.time() - start))
 
                 return prediction == self._bark_label and score > 0.25
+
 
 def _load_labels(filename):
     """Read in labels, one label per line."""
     return [line.rstrip() for line in tf.gfile.GFile(filename)]
+
 
 def _load_graph(filename):
     """Unpersists graph from file as default graph."""

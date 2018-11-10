@@ -11,6 +11,7 @@ from email.header import Header
 from email.utils import formataddr
 from multiprocessing import Process
 
+
 class Gmailsender():
     def __init__(self, gmail_email, gmail_password, from_name=None, from_email=None, debug=False):
         self._gmail_email = gmail_email
@@ -32,8 +33,10 @@ class Gmailsender():
 
         message = MIMEMultipart('alternative')
         message['Subject'] = subject
-        message['From'] = formataddr((str(Header(self._from_name, 'utf-8')), self._from_email))
-        message['Reply-To'] = formataddr((str(Header(self._from_name, 'utf-8')), self._from_email))
+        message['From'] = formataddr(
+            (str(Header(self._from_name, 'utf-8')), self._from_email))
+        message['Reply-To'] = formataddr(
+            (str(Header(self._from_name, 'utf-8')), self._from_email))
         message['To'] = ", ".join(recipients)
         mimeText = MIMEText(text, 'plain')
         message.attach(mimeText)
@@ -42,11 +45,10 @@ class Gmailsender():
         mailServer.ehlo()
         mailServer.starttls()
         mailServer.ehlo()
-        mailServer.login(self._gmail_email, self._gmail_password) 
+        mailServer.login(self._gmail_email, self._gmail_password)
 
         mailServer.sendmail(self._from_email, recipients, message.as_string())
         mailServer.quit()
-
 
     def send_email_async(self, subject, text, recipients):
         '''
