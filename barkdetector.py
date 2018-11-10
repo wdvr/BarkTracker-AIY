@@ -12,6 +12,7 @@ import sound_input
 class Barkdetector():
     def __init__(self, labels, bark_label, graph_file, ambient_db, debug=False):
         self._ambient_db = ambient_db
+        self._debug = debug
 
         if graph_file and labels:
             self._labels = labels
