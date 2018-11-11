@@ -5,9 +5,11 @@ A Bark detector. Analyzes an audio file to determine whether it is a bark or not
 '''
 
 import time
-import tensorflow as tf
-import sound_input
+import logging
 
+import tensorflow as tf
+
+import sound_input
 
 class Barkdetector():
     def __init__(
@@ -34,11 +36,9 @@ class Barkdetector():
 
     def is_loud(self, wav):
         """Analyses if the passed audio fragment is considered 'loud'. Returns True if it is higher than the ambient_db"""
-        if self._debug:
-            print("getting peak volume at {}".format(time.time()))
+        logging.debug("getting peak volume at {}".format(time.time()))
         current_loudness = sound_input.get_peak_volume(wav)
-        if self._debug:
-            print("result: {}".format(current_loudness))
+        logging.debug("result: {}".format(current_loudness))
         return current_loudness >= self._ambient_db
 
     def is_bark(self, wav):
@@ -57,8 +57,7 @@ class Barkdetector():
                 top_k = predictions.argsort()[-1:][::-1]
                 prediction = self._labels_list[top_k[0]]
                 score = predictions[top_k[0]]
-                if self._debug:
-                    print('{} (score = {:.2f}) - took {:.2f}'.format(prediction,
+                logging.debug('{} (score = {:.2f}) - took {:.2f}'.format(prediction,
                                                                      score, time.time() - start))
 
                 return prediction == self._bark_label and score > 0.25

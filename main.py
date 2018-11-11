@@ -4,16 +4,27 @@
 The main file to run. Process that runs indefinitely, and listens for button presses to start or stop the bark tracking.
 '''
 
-import aiy.voicehat
 import datetime
 import time
+import signal
+import sys
+import logging
 from threading import Thread, Event, Lock
+
+import aiy.voicehat
 
 import settings
 from barkservice import Barksession
 from sonosservice import Sonosservice
 from lifxservice import Lifxservice
 from gmailsender import Gmailsender
+
+
+logging.basicConfig(filename='/home/pi/logs/barktracker-{}.log'.format(time.strftime("%Y%m%d-%H%M%S")),
+                            filemode='a',
+                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.DEBUG)
 
 
 class ButtonListener(object):
@@ -24,6 +35,8 @@ class ButtonListener(object):
         self._debug = settings.DEBUG
         self._services = None
         self._lock = Lock()
+        
+        signal.signal(signal.SIGINT, self._shutdown)
 
     def run(self):
         self._voicehat_ui.status('power-off')
@@ -31,7 +44,7 @@ class ButtonListener(object):
 
     def _button_listen(self):
         aiy.voicehat.get_button().on_press(self._toggle_button)
-        print("BarkTracker is loaded. Press the button to get started.")
+        logging.info("BarkTracker is loaded. Press the button to get started.")
         if self._debug:
             self._toggle_button()
         else:
@@ -71,7 +84,10 @@ class ButtonListener(object):
                 bg_thread = Thread(target=service.start)
                 bg_thread.start()
             self._lock.release()
-
+            
+    def _shutdown(self, sig, frame):
+        aiy.voicehat.get_status_ui().status('power-off')
+        sys.exit(0)
 
 def create_services():
     gmail_sender = Gmailsender(settings.GMAIL_USER,

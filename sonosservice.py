@@ -5,6 +5,7 @@ Starts and stops sonos speakers
 '''
 
 import sys
+import logging
 import time
 import datetime
 
@@ -26,7 +27,7 @@ class Sonosservice():
 
     def start(self):
         if self._debug:
-            print("Turning on the radio - DEBUG")
+            logging.debug("Turning on the radio - DEBUG")
         else:
             for speaker in self._speakers:
                 speaker.play_uri(uri=self._uri, meta=DUMMY_META)

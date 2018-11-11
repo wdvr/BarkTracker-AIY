@@ -4,6 +4,7 @@
 Starts and stops lifx lamps
 '''
 
+import logging
 from lifxlan import LifxLAN
 
 
@@ -15,7 +16,7 @@ class Lifxservice():
     def start(self):
         # make sure lights are off when leaving
         if self._debug:
-            print("turning off the lights - DEBUG")
+            logging.debug("turning off the lights - DEBUG")
         else:
             self._lifxlan.set_power_all_lights("off", rapid=True)
 

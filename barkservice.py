@@ -4,7 +4,9 @@
 A Barksession monitors for volume peaks and plays audio files as a response.
 '''
 
+import logging
 import datetime
+import time
 from threading import Lock
 
 import sound_input
@@ -45,7 +47,7 @@ class Barksession():
         # be stricter if re-bark within this # of sec
         self._stricter_timer = 5 if debug else 40
         # reward a silence after this # of seconds
-        self._reward_timer = 3 if debug else 15
+        self._reward_timer = 7 if debug else 15
 
         self._lock = Lock()
 
@@ -82,6 +84,7 @@ class Barksession():
     def _detect(self):
         tmp_file = "/tmp/sound.wav"
         while True:
+            
             sound_input.record(tmp_file, 0.5)
             is_bark = self._barkdetector.is_bark(
                 tmp_file) if self._use_ai else self._barkdetector.is_loud(tmp_file)
@@ -95,7 +98,8 @@ class Barksession():
             if not is_bark:
                 if self._bark_alert and time_difference > datetime.timedelta(
                         seconds=self._reward_timer):
-                    print("{0}: Bark stopped. Calm again.".format(
+                    
+                    logging.info("{0}: Bark stopped. Calm again.".format(
                         current_time.strftime("%H:%M:%S")))
                     if self._session_email_sent:
                         self._gmail_sender.send_email_async(
@@ -114,12 +118,13 @@ class Barksession():
             self._bark_alert = True
 
             if(not len(self._bark_sessions) or time_difference > datetime.timedelta(seconds=self._stricter_timer)):
-                print("{0}: New bark detected. Trying the short messages."
+                logging.info("{0}: New bark detected. Trying the short messages."
                       .format(current_time.strftime("%H:%M:%S")))
                 self._lock.acquire()
                 self._bark_sessions.append([current_time, None])
                 self._lock.release()
                 soundbox.warn_short()
+                time.sleep(0.5)
             else:
                 text = "Kelvin is being noisy at " + \
                     current_time.strftime("%H:%M:%S")
@@ -132,7 +137,7 @@ class Barksession():
 
                 if not self._session_email_sent and time_since_start_bark > datetime.timedelta(
                         seconds=20):
-                    print("{0}: More then 20 seconds, sending first warning."
+                    logging.info("{0}: More then 20 seconds, sending first warning."
                           .format(current_time.strftime("%H:%M:%S")))
                     self._gmail_sender.send_email_async(
                         "New persistent bark for longer than 20 seconds.", text, self._recipients)
@@ -150,11 +155,12 @@ class Barksession():
                     self._last_email = current_time
                     self._session_email_sent = True
                 else:
-                    print(
+                    logging.info(
                         "{0}: Persistent bark detected. Trying the long messages." .format(
                             current_time.strftime("%H:%M:%S")))
 
                 soundbox.warn_long()
+                time.sleep(0.5)
 
             self._last_bark = datetime.datetime.now()
 
