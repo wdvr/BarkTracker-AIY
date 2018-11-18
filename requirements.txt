@@ -5,3 +5,4 @@ numpy
 pygame
 tensorflow
 lifxlan
+ephem

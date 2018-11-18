@@ -24,6 +24,9 @@ RECIPIENTS = ["someone@domain.com", "test@otherdomain.com"]
 ### BARK DETECTION ###
 ######################
 
+# Name of the dog
+DOG = "Bobby"
+
 # A bark can be detected by 
 # 1. listening for peak volumes (USE_AI=False). This is easy, out of the box.
 # 2. using a trained neural network for bark detection. Might need to be trained for your dog's bark.
@@ -48,7 +51,7 @@ AI_GRAPH = '/path/to/graph.pb
 
 # When not using AI, provide the ambient volume, under which sound is not considered 'loud'. 
 # You might have to play around with this value to get it right, depending on your microphone.
-AMBIENT_DB = 0.30
+AMBIENT_DB = 0.50
 
 
 ######################
@@ -64,3 +67,9 @@ SONOS_SPEAKER_IPS = ['192.168.1.2']
 # ./sonosservice.py after filling at least one IP address above
 
 SONOS_CHANNEL_URI = ''
+
+#####################
+### LIFX SETTINGS ###
+#####################
+# Your location: (latitude, longitude). Used to turn on the lights when coming home after sunset.
+LOCATION = (42.2986, -71.0315)

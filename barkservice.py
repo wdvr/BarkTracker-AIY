@@ -18,6 +18,7 @@ from barkdetector import Barkdetector
 class Barksession():
     def __init__(
             self,
+            dog,
             gmail_sender,
             recipients,
             use_ai,
@@ -26,6 +27,7 @@ class Barksession():
             ai_graph=None,
             ambient_db=None,
             debug=False):
+        self._dog = dog
         self._gmail_sender = gmail_sender
         self._recipients = recipients
 
@@ -76,18 +78,19 @@ class Barksession():
         if len(summary):
             total_duration = sum(summary.values(), datetime.timedelta(0))
             longest_bark = max(summary.values())
-            return "Today we saw {0} bark sessions, for a total bark time of {1}. The longest bark was one of {2}.".format(
-                len(summary), timedelta_format(total_duration), timedelta_format(longest_bark))
+            return "Today {} barked {0} times, for a total bark time of {1}. The longest bark was one of {2}.".format(
+                self._dog, len(summary), timedelta_format(total_duration), timedelta_format(longest_bark))
         else:
-            return "No barks at all today, great!"
+            return "{} didn't bark at all today, good dog!".format(self._dog)
 
     def _detect(self):
         tmp_file = "/tmp/sound.wav"
         while True:
-            
             sound_input.record(tmp_file, 0.5)
+            
             is_bark = self._barkdetector.is_bark(
                 tmp_file) if self._use_ai else self._barkdetector.is_loud(tmp_file)
+
             if self._stop_requested:
                 return
 

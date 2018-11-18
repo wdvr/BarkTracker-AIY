@@ -6,6 +6,7 @@ Class to play audio files, randomly, from subfolders
 import random
 import glob
 import pygame
+import logging
 
 resource_dir = "resources/"
 warn_short_dir = resource_dir + "warn-short/"
@@ -35,11 +36,13 @@ def get_random_file(folder, extension="*.mp3"):
 
 
 def play_sound(audio_file):
-    pygame.mixer.music.load(audio_file)
-    pygame.mixer.music.play()
-    while pygame.mixer.music.get_busy():
-        pygame.time.Clock().tick(10)
-
+    try:
+        pygame.mixer.music.load(audio_file)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            pygame.time.Clock().tick(10)
+    except Exception as e:
+        logging.error("Error while playing file {}, exception details: {}".format(audio_file, e))
 
 if __name__ == "__main__":
     play_sound(get_random_file(warn_short_dir))

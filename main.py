@@ -14,6 +14,7 @@ from threading import Thread, Event, Lock
 import aiy.voicehat
 
 import settings
+from daytime import Daytime
 from barkservice import Barksession
 from sonosservice import Sonosservice
 from lifxservice import Lifxservice
@@ -61,15 +62,19 @@ class ButtonListener(object):
             summaries = []
             self._lock.acquire()
             for service in self._services:
-                service.stop()
-                summaries.append(service.generate_summary())
+                try: 
+                    service.stop()
+                    summaries.append(service.generate_summary())
+                except Exception as e:
+                    logging.error("Could not stop service of class {}. Error: {}".format(service.__class__.__name__, e))
+
             self._services = None
             self._lock.release()
             if self._debug:
                 print(summaries)
             else:
                 aiy.audio.say(
-                    "Welcome back! Here's your summary of what happened: ")
+                    "Good {}. Welcome back. Here's your summary: ".format(Daytime.part_of_day()))
                 for summary in filter(None, summaries):
                     aiy.audio.say(summary)
         else:
@@ -81,8 +86,11 @@ class ButtonListener(object):
             self._lock.acquire()
             self._services = create_services()
             for service in self._services:
-                bg_thread = Thread(target=service.start)
-                bg_thread.start()
+                try: 
+                    bg_thread = Thread(target=service.start)
+                    bg_thread.start()
+                except Exception as e:
+                    logging.error("Could not start service of class {}. Error: {}".format(service.__class__.__name__, e))
             self._lock.release()
             
     def _shutdown(self, sig, frame):
@@ -96,7 +104,9 @@ def create_services():
                                from_email=settings.FROM_EMAIL,
                                debug=settings.DEBUG)
 
-    bark_tracker = Barksession(gmail_sender=gmail_sender,
+    bark_tracker = Barksession(
+                               dog=settings.DOG,
+                               gmail_sender=gmail_sender,
                                recipients=settings.RECIPIENTS,
                                use_ai=settings.USE_AI,
                                ai_labels=settings.AI_LABELS,
@@ -107,7 +117,8 @@ def create_services():
 
     sonos_service = Sonosservice(debug=settings.DEBUG)
 
-    lifx_service = Lifxservice(debug=settings.DEBUG)
+    lifx_service = Lifxservice(location=settings.LOCATION,
+                               debug=settings.DEBUG)
 
     return [bark_tracker, sonos_service, lifx_service]
 

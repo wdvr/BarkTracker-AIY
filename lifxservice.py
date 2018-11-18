@@ -6,29 +6,31 @@ Starts and stops lifx lamps
 
 import logging
 from lifxlan import LifxLAN
-
+from daytime import Daytime
 
 class Lifxservice():
-    def __init__(self, debug=False):
+    def __init__(self, location, debug=False):
         self._debug = debug
         self._lifxlan = LifxLAN()
+
+        self._daytime = Daytime(location)
 
     def start(self):
         # make sure lights are off when leaving
         if self._debug:
             logging.debug("turning off the lights - DEBUG")
         else:
-            self._lifxlan.set_power_all_lights("off", rapid=True)
+            self._lifxlan.set_power_all_lights("off", rapid=False)
 
     def stop(self):
-        # When coming home, I don't really need to turn on all the lights
-        return
+        # When coming home, turn on the lights if the sun has set
+        if self._daytime.dark_outside():
+            self._lifxlan.set_power_all_lights("on", rapid=False)            
 
     def generate_summary(self):
         # Not very interesting to show a summary for the sonos service
         return None
-
-
-if __name__ == '__main__':
+    
+if __name__ == '__main__':    
     print("turning lifx lamps on")
-    lifxlan.set_power_all_lights("on", rapid=True)
+    LifxLAN().set_power_all_lights("on", rapid=False)
