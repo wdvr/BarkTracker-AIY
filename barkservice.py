@@ -78,7 +78,7 @@ class Barksession():
         if len(summary):
             total_duration = sum(summary.values(), datetime.timedelta(0))
             longest_bark = max(summary.values())
-            return "Today {} barked {0} times, for a total bark time of {1}. The longest bark was one of {2}.".format(
+            return "Today {} barked {} times, for a total bark time of {}. The longest bark was one of {}.".format(
                 self._dog, len(summary), timedelta_format(total_duration), timedelta_format(longest_bark))
         else:
             return "{} didn't bark at all today, good dog!".format(self._dog)
@@ -102,8 +102,7 @@ class Barksession():
                 if self._bark_alert and time_difference > datetime.timedelta(
                         seconds=self._reward_timer):
                     
-                    logging.info("{0}: Bark stopped. Calm again.".format(
-                        current_time.strftime("%H:%M:%S")))
+                    logging.info("Bark stopped. Calm again.")
                     if self._session_email_sent:
                         self._gmail_sender.send_email_async(
                             "Bark alert lifted.", "All is calm again.", self._recipients)
@@ -121,16 +120,14 @@ class Barksession():
             self._bark_alert = True
 
             if(not len(self._bark_sessions) or time_difference > datetime.timedelta(seconds=self._stricter_timer)):
-                logging.info("{0}: New bark detected. Trying the short messages."
-                      .format(current_time.strftime("%H:%M:%S")))
+                logging.info("New bark detected. Trying the short messages.")
                 self._lock.acquire()
                 self._bark_sessions.append([current_time, None])
                 self._lock.release()
                 soundbox.warn_short()
                 time.sleep(0.5)
             else:
-                text = "Kelvin is being noisy at " + \
-                    current_time.strftime("%H:%M:%S")
+                text = "{} is being noisy at {}".format(self._dogcurrent_time.strftime("%H:%M:%S"))
 
                 time_since_last_email = current_time - self._last_email
                 self._lock.acquire()
@@ -140,16 +137,14 @@ class Barksession():
 
                 if not self._session_email_sent and time_since_start_bark > datetime.timedelta(
                         seconds=20):
-                    logging.info("{0}: More then 20 seconds, sending first warning."
-                          .format(current_time.strftime("%H:%M:%S")))
+                    logging.info("More then 20 seconds, sending first warning.")
                     self._gmail_sender.send_email_async(
                         "New persistent bark for longer than 20 seconds.", text, self._recipients)
                     self._last_email = current_time
                     self._session_email_sent = True
 
                 elif self._session_email_sent and (time_since_last_email > datetime.timedelta(seconds=20)):
-                    print("{0}: consecutive warning. Re-sending e-mail."
-                          .format(current_time.strftime("%H:%M:%S")))
+                    logging.info("consecutive warning. Re-sending e-mail.")
 
                     self._gmail_sender.send_email_async(
                         "Still going, persistent bark for longer than 20 seconds.",
@@ -159,8 +154,7 @@ class Barksession():
                     self._session_email_sent = True
                 else:
                     logging.info(
-                        "{0}: Persistent bark detected. Trying the long messages." .format(
-                            current_time.strftime("%H:%M:%S")))
+                        "Persistent bark detected. Trying the long messages.")
 
                 soundbox.warn_long()
                 time.sleep(0.5)

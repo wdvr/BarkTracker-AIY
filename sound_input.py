@@ -8,6 +8,7 @@ import aiy
 from wavefile import WaveReader
 import time
 import numpy as np
+import logging
 
 streamChunk = 512  # chunk used for the analyzing input stream
 
