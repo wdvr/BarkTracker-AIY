@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/ballooninc/barktracker/_apis/build/status/wdvr.BarkTracker-AIY)](https://dev.azure.com/ballooninc/barktracker/_build/latest?definitionId=1)
+
 # BarkTracker-AIY
 A monitor for dog barking, to be used with a Google AIY Voice Kit. The script is supposed to run in the background, listening for a button press to start tracking. Voice messages are played when barks are detected, and if a barksession goes on for more than 20 seconds, an e-mail is sent. 
 
