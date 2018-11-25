@@ -1,6 +1,6 @@
 requests
 soco
-wavefile
+git+git://github.com/wdvr/python-wavefile.git#egg=wavefile
 numpy
 pygame
 tensorflow

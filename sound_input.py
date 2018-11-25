@@ -5,6 +5,8 @@ Barktracker helper class
 '''
 
 import aiy
+import aiy.voicehat # Without this, aiy._drivers is not found.
+
 from wavefile import WaveReader
 import time
 import numpy as np
@@ -20,7 +22,7 @@ def record(filepath, duration):
         with recorder, dumper:
             recorder.add_processor(dumper)
             while not dumper.is_done():
-                time.sleep(0.1)
+                time.sleep(0.05)
     except Exception as e:
         logging.error("Error while recording to file {}: {}".format(filepath, e))
 

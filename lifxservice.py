@@ -16,11 +16,7 @@ class Lifxservice():
         self._daytime = Daytime(location)
 
     def start(self):
-        # make sure lights are off when leaving
-        if self._debug:
-            logging.debug("turning off the lights - DEBUG")
-        else:
-            self._lifxlan.set_power_all_lights("off", rapid=False)
+        self._lifxlan.set_power_all_lights("off", rapid=False)
 
     def stop(self):
         # When coming home, turn on the lights if the sun has set

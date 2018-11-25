@@ -33,7 +33,7 @@ class ButtonListener(object):
         self._tracker_active = False
         self._ui_thread = Thread(target=self._button_listen)
         self._debug = settings.DEBUG
-        self._services = None
+        self._services = []
         self._lock = Lock()
         
         signal.signal(signal.SIGINT, self._shutdown)
@@ -55,9 +55,9 @@ class ButtonListener(object):
 
     def _toggle_button(self):
         if self._tracker_active:
-            self._start_tracker()
-        else:
             self._stop_tracker()
+        else:
+            self._start_tracker()
 
     def _start_tracker(self):
         logging.info("Tracker started.")

@@ -7,8 +7,6 @@ A Bark detector. Analyzes an audio file to determine whether it is a bark or not
 import time
 import logging
 
-import tensorflow as tf
-
 import sound_input
 
 class Barkdetector():
@@ -23,6 +21,8 @@ class Barkdetector():
         self._debug = debug
 
         if graph_file and labels:
+            import tensorflow as tf
+
             self._labels = labels
             self._bark_label = bark_label
             self._input_name = 'wav_data:0'

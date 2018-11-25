@@ -1,7 +1,5 @@
 # do not check in audio files
-*mp3
-*wav
-*m4a
+resources/*/*
 
 # only commit settings.py.sample
 settings.py

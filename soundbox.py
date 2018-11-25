@@ -40,11 +40,9 @@ def play_sound(audio_file):
         pygame.mixer.music.load(audio_file)
         pygame.mixer.music.play()
         while pygame.mixer.music.get_busy():
-            pygame.time.Clock().tick(10)
+            pygame.time.Clock().tick(50)
     except Exception as e:
         logging.error("Error while playing file {}, exception details: {}".format(audio_file, e))
 
 if __name__ == "__main__":
     play_sound(get_random_file(warn_short_dir))
-    while pygame.mixer.music.get_busy():
-        pygame.time.Clock().tick(10)
