@@ -8,7 +8,7 @@ from daytime import Daytime
 
 
 def test_day_night():
-    with open('test/day-night.json', 'r') as f:
+    with open('tests/day-night.json', 'r') as f:
         day_night_results = json.load(f)
         
     year=2018
@@ -26,7 +26,7 @@ def test_day_night():
                 assert dark == day_night_results[location+" "+str(time)], "expected it to be {} on {} at {} (coords:{}), got opposite.".format("dark" if dark else "not dark", time, location, coords)
 
 def test_greeting():
-    with open('test/part-of-day.json', 'r') as f:
+    with open('tests/part-of-day.json', 'r') as f:
         part_of_day_results = json.load(f)
 
     for hour in range(24):
