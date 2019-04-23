@@ -11,8 +11,8 @@ import sys
 import logging
 from threading import Thread, Event, Lock
 
-import aiy.voicehat
-
+from aiy.board import Board, Led
+import aiy.voice.tts as googlevoice
 import settings
 from daytime import Daytime
 from barkservice import Barksession
@@ -29,7 +29,7 @@ logging.basicConfig(filename='/home/pi/logs/barktracker-{}.log'.format(time.strf
 
 class ButtonListener(object):
     def __init__(self):
-        self._voicehat_ui = aiy.voicehat.get_status_ui()
+        self._board = Board()
         self._tracker_active = False
         self._ui_thread = Thread(target=self._button_listen)
         self._debug = settings.DEBUG
@@ -39,18 +39,18 @@ class ButtonListener(object):
         signal.signal(signal.SIGINT, self._shutdown)
 
     def run(self):
-        self._voicehat_ui.status('power-off')
+        self._board.led.state = Led.OFF
         self._ui_thread.start()
 
     def _button_listen(self):
-        aiy.voicehat.get_button().on_press(self._toggle_button)
+        self._board.button.when_pressed = lambda : self._toggle_button()
         logging.info("BarkTracker is loaded. Press the button to get started.")
         if self._debug:
             self._toggle_button()
         else:
-            self._voicehat_ui.status('error')
+            self._board.led.state = Led.BLINK
             time.sleep(10)
-            self._voicehat_ui.status('power-off')
+            self._board.led.state = Led.OFF
         Event().wait()
 
     def _toggle_button(self):
@@ -61,10 +61,10 @@ class ButtonListener(object):
 
     def _start_tracker(self):
         logging.info("Tracker started.")
-        self._voicehat_ui.status('listening')
+        self._board.led.state = Led.ON
         self._tracker_active = True
         if not self._debug:
-            aiy.audio.say('Starting Barktracker.')
+            googlevoice.say('Starting Barktracker.')
         time.sleep(2)
         self._lock.acquire()
         self._services = create_services()
@@ -79,7 +79,7 @@ class ButtonListener(object):
     def _stop_tracker(self):
         logging.info("Tracker stopped.")
 
-        self._voicehat_ui.status('power-off')
+        self._board.led.state = Led.OFF
         self._tracker_active = False
 
         summaries = []
@@ -94,15 +94,15 @@ class ButtonListener(object):
         self._services = None
         self._lock.release()
         if not self._debug:
-            aiy.audio.say(
+            googlevoice.say(
                 "Good {}. Welcome back. Here's your summary: ".format(Daytime.part_of_day()))
             for summary in filter(None, summaries):
                 logging.info(summary)
-                aiy.audio.say(summary)
+                googlevoice.say(summary)
 
 
     def _shutdown(self, sig, frame):
-        aiy.voicehat.get_status_ui().status('power-off')
+        self._board.led.state = Led.OFF
         sys.exit(0)
 
 def create_services():

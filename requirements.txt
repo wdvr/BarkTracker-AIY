@@ -6,5 +6,7 @@ pygame
 tensorflow
 lifxlan
 ephem
+
 pytest
 python-coveralls
+pytest-mock

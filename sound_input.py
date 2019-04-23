@@ -4,8 +4,7 @@
 Barktracker helper class
 '''
 
-import aiy
-import aiy.voicehat # Without this, aiy._drivers is not found.
+from aiy.voice.audio import AudioFormat, record_file, Recorder
 
 from wavefile import WaveReader
 import time
@@ -14,15 +13,11 @@ import logging
 
 streamChunk = 512  # chunk used for the analyzing input stream
 
-
 def record(filepath, duration):
     try:
-        recorder = aiy._drivers._recorder.Recorder()
-        dumper = aiy.audio._WaveDump(filepath, duration)
-        with recorder, dumper:
-            recorder.add_processor(dumper)
-            while not dumper.is_done():
-                time.sleep(0.05)
+        start=time.time()
+        record_file(AudioFormat.CD, filename=filepath, wait=lambda: time.sleep(duration), filetype='wav')
+
     except Exception as e:
         logging.error("Error while recording to file {}: {}".format(filepath, e))
 
